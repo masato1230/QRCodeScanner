@@ -3,6 +3,7 @@ package com.jp_funda.qrcodescanner
 import android.util.Log
 import android.view.ViewGroup
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.Composable
@@ -11,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 
 @Composable
 fun CameraPreview(modifier: Modifier) {
@@ -34,13 +36,24 @@ fun CameraPreview(modifier: Modifier) {
                     it.setSurfaceProvider(previewView.surfaceProvider)
                 }
 
+            // QRコード解析UseCase
+            val qrCodeAnalysisUseCase = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+                .also {
+                    it.setAnalyzer(
+                        Executors.newSingleThreadExecutor(),
+                        QRCodeAnalyzer()
+                    )
+                }
+
             coroutineScope.launch {
                 val cameraProvider = context.getCameraProvider()
                 try {
                     // use caseをライフサイクルにバインドする前にアンバインドを行う必要がある
                     cameraProvider.unbindAll()
                     cameraProvider.bindToLifecycle(
-                        lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, previewUseCase
+                        lifecycleOwner, CameraSelector.DEFAULT_BACK_CAMERA, previewUseCase, qrCodeAnalysisUseCase
                     )
                 } catch (ex: Exception) {
                     Log.e("CameraPreview", "Use case binding failed", ex)
