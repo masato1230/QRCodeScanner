@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @Composable
-fun CameraPreview(modifier: Modifier) {
+fun CameraPreview(modifier: Modifier, onQrDetected: (code: String) -> Unit) {
     val coroutineScope = rememberCoroutineScope()
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -43,7 +43,7 @@ fun CameraPreview(modifier: Modifier) {
                 .also {
                     it.setAnalyzer(
                         Executors.newSingleThreadExecutor(),
-                        QRCodeAnalyzer()
+                        QRCodeAnalyzer(onQrDetected)
                     )
                 }
 

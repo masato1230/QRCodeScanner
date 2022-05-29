@@ -9,7 +9,7 @@ import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
 
-class QRCodeAnalyzer : ImageAnalysis.Analyzer {
+class QRCodeAnalyzer(private val onQrDetected: (code: String) -> Unit) : ImageAnalysis.Analyzer {
     private val qrScannerOptions: BarcodeScannerOptions
         get() {
             return BarcodeScannerOptions.Builder()
@@ -31,6 +31,7 @@ class QRCodeAnalyzer : ImageAnalysis.Analyzer {
                 .addOnSuccessListener {
                     if (it.isNotEmpty()) {
                         Log.d("Success", "Detected code is ${it[0].rawValue}")
+                        onQrDetected(it[0].rawValue.toString())
                     }
                 }
                 .addOnCompleteListener { image.close() }

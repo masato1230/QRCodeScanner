@@ -9,11 +9,21 @@ import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import com.jp_funda.qrcodescanner.ui.theme.QRCodeScannerTheme
 
@@ -71,5 +81,21 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainContent() {
-    CameraPreview(modifier = Modifier.fillMaxSize())
+    val detectedQrCode = remember { mutableStateOf("") }
+
+    CameraPreview(modifier = Modifier.fillMaxSize()) {
+        detectedQrCode.value = it
+    }
+
+    Text(
+        text = detectedQrCode.value,
+        color = Color.White,
+        style = MaterialTheme.typography.h6,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .background(Color.Black.copy(alpha = 0.5f))
+            .padding(vertical = 10.dp)
+    )
 }
